@@ -1,0 +1,70 @@
+---
+- name: apt install debconf
+  apt:
+    name:
+      - debconf
+      - debconf-utils
+
+- name: debconf-set-selections
+  debconf:
+    name: postfix
+    question: postfix/main_mailer_type
+    value: No configuration
+    vtype: select
+
+- name: apt install postfix
+  apt:
+    name: postfix
+    policy_rc_d: 101
+
+- name: /etc/postfix/main.cf
+  template:
+    src: etc/postfix/main.cf
+    dest: /etc/postfix/
+    mode: 0444
+  register: postfix_etc_postfix_main_cf_
+
+- name: /etc/postfix/master.cf
+  template:
+    src: etc/postfix/master.cf
+    dest: /etc/postfix/
+    mode: 0444
+  register: postfix_etc_postfix_master_cf_
+
+- name: <postfix_postmap>
+  template:
+    src: "{{ item.value }}"
+    dest: "{{ item.key }}"
+  loop: "{{ postfix_postmap | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: postfix_postmap_template_
+
+- name: postmap …
+  command: /usr/sbin/postmap "{{ item.item.key }}"
+  when: item is changed
+  loop: "{{ postfix_postmap_template_.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+
+- name: <postfix_postalias>
+  template:
+    src: "{{ item.value }}"
+    dest: "{{ item.key }}"
+  loop: "{{ postfix_postalias | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: postfix_postalias_template_
+
+- name: postalias …
+  command: /usr/sbin/postalias "{{ item.item.key }}"
+  when: item is changed
+  loop: "{{ postfix_postalias_template_.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+
+- name: systemctl enable --now postfix.service
+  systemd:
+    name: postfix.service
+    enabled: true
+    state: "{{ ((postfix_etc_postfix_main_cf_ is changed) or (postfix_etc_postfix_master_cf_ is changed)) | ternary('restarted', 'started') }}"

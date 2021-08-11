@@ -1,0 +1,11 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  roles:
+    - role: postfix
+
+  pre_tasks:
+    - name: apt update
+      apt:
+        update_cache: true

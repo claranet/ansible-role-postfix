@@ -1,0 +1,56 @@
+---
+- name: Destroy
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  no_log: false
+  tasks:
+    - name: stat molecule_instance_config
+      stat:
+        path: "{{ molecule_instance_config }}"
+      register: stat_molecule_instance_config
+
+    - name: Populate instance config
+      set_fact:
+        instance_conf: >-
+          {% if stat_molecule_instance_config.stat.exists -%}
+          {{ lookup('file', molecule_instance_config) | from_yaml }}
+          {% else -%}
+          {}
+          {% endif -%}
+        skip_instances: "{{ not stat_molecule_instance_config.stat.exists }}"
+
+    - name: Destroy molecule instance(s)
+      ec2:
+        state: absent
+        instance_ids: "{{ item.instance_ids }}"
+      register: server
+      loop: "{{ instance_conf|list }}"
+      loop_control:
+        label: "{{ item.instance }}"
+      when: not skip_instances
+      async: 7200
+      poll: 0
+
+    - name: Wait for instance(s) deletion to complete
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: ec2_jobs
+      until: ec2_jobs.finished
+      retries: 300
+      loop: "{{ server.results }}"
+      loop_control:
+        label: "{{ item.item.instance }}"
+
+    # Mandatory configuration for Molecule to function.
+
+    - name: Populate instance config
+      set_fact:
+        instance_conf: {}
+
+    - name: Dump instance config
+      copy:
+        content: "{{ instance_conf | to_json | from_json | to_yaml }}"
+        dest: "{{ molecule_instance_config }}"
+        mode: 0644
+      when: server.changed | bool

@@ -1,0 +1,11 @@
+## {{ ansible_managed }}
+## grep -v '^##' /etc/postfix/master.cf | column -s $'\t' -t
+##
+## http://www.postfix.org/master.5.html 
+## ==========================================================================
+# service	type	private(yes)	unpriv(yes)	chroot(no)	wakeup(100)	maxproc	command + args
+## ==========================================================================
+
+{% for k, v in postfix_master_conf_.items() if v is not none %}
+{{ k| regex_replace(' ', '\t') }}	{{v["private"]}}	{{v["unpriv"]}}	{{v["chroot"]}}	{{v["wakeup"]}}	{{v["maxproc"]}}	{{v["command"]}}
+{% endfor %}

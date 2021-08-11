@@ -1,0 +1,3 @@
+---
+postfix_main_conf_: "{{ postfix_main_conf_default | combine(postfix_main_conf) }}"
+postfix_master_conf_: "{{ lookup('vars', 'postfix_master_conf_default_' ~ ansible_distribution_release) | combine(postfix_master_conf) }}"
