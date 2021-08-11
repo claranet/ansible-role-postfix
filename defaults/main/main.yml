@@ -3,8 +3,8 @@
 postfix_main_conf: {}
 postfix_main_conf_default:
   compatibility_level: 2
-  biff: no
-  append_dot_mydomain: no
+  biff: "no"
+  append_dot_mydomain: "no"
   mailbox_size_limit: 0
   recipient_delimiter: "+"
   inet_protocols: ipv4

@@ -9,12 +9,13 @@ import yaml
 master_cf = open("master.cf")
 
 services = {}
+last_service = None
 
 for line in master_cf:
     # comment
     if line.startswith("#"):
         continue
-    
+
     # whitespace-only line
     if re.match(r"\s*$", line):
         continue

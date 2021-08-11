@@ -35,12 +35,13 @@
   template:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
+    mode: 0444
   loop: "{{ postfix_postmap | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   register: postfix_postmap_template_
 
-- name: postmap …
+- name: postmap …  # noqa no-handler
   command: /usr/sbin/postmap "{{ item.item.key }}"
   when: item is changed
   loop: "{{ postfix_postmap_template_.results }}"
@@ -51,12 +52,13 @@
   template:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
+    mode: 0444
   loop: "{{ postfix_postalias | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
   register: postfix_postalias_template_
 
-- name: postalias …
+- name: postalias …  # noqa no-handler
   command: /usr/sbin/postalias "{{ item.item.key }}"
   when: item is changed
   loop: "{{ postfix_postalias_template_.results }}"
