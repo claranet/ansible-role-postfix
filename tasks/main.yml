@@ -1,72 +1,75 @@
 ---
-- name: apt install debconf
-  apt:
-    name:
-      - debconf
-      - debconf-utils
+- name: postfix - Include "configure_{{ ansible_pkg_mgr }}.yml"
+  include_tasks: "{{ item }}"
+  loop: "{{ query('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - configure_{{ ansible_pkg_mgr }}.yml
+      skip: true
 
-- name: debconf-set-selections
-  debconf:
+- name: postfix - Install postfix
+  package:
     name: postfix
-    question: postfix/main_mailer_type
-    value: No configuration
-    vtype: select
 
-- name: apt install postfix
-  apt:
-    name: postfix
-    policy_rc_d: 101
-
-- name: /etc/postfix/main.cf
+- name: postfix - Configure /etc/postfix/main.cf
   template:
     src: etc/postfix/main.cf
-    dest: /etc/postfix/
+    dest: "{{ _postfix_main_cf }}"
     mode: 0444
-  register: postfix_etc_postfix_main_cf_
+    owner: root
+    group: root
+  register: _postfix_etc_postfix_main_cf
 
-- name: /etc/postfix/master.cf
+- name: postfix - Configure /etc/postfix/master.cf
   template:
     src: etc/postfix/master.cf
-    dest: /etc/postfix/
+    dest: "{{ _postfix_master_cf }}"
     mode: 0444
-  register: postfix_etc_postfix_master_cf_
+    owner: root
+    group: root
+  register: _postfix_etc_postfix_master_cf
 
-- name: <postfix_postmap>
+- name: postfix - Configure postmap from `postfix_postmap`
   template:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
     mode: 0444
+    owner: root
+    group: root
   loop: "{{ postfix_postmap | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  register: postfix_postmap_template_
+  register: _postfix_postmap_template
 
-- name: postmap …  # noqa no-handler
+- name: postfix - Execute postmap command  # noqa no-handler
   command: /usr/sbin/postmap "{{ item.item.key }}"
   when: item is changed
-  loop: "{{ postfix_postmap_template_.results }}"
+  loop: "{{ _postfix_postmap_template.results }}"
   loop_control:
     label: "{{ item.item.key }}"
 
-- name: <postfix_postalias>
+- name: postfix - Configure postaliases from `postfix_postalias`
   template:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
     mode: 0444
+    owner: root
+    group: root
   loop: "{{ postfix_postalias | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
-  register: postfix_postalias_template_
+  register: _postfix_postalias_template
 
-- name: postalias …  # noqa no-handler
+- name: postfix - Execute postalias command  # noqa no-handler
   command: /usr/sbin/postalias "{{ item.item.key }}"
   when: item is changed
-  loop: "{{ postfix_postalias_template_.results }}"
+  loop: "{{ _postfix_postalias_template.results }}"
   loop_control:
     label: "{{ item.item.key }}"
 
-- name: systemctl enable --now postfix.service
+- name: postfix - Enable systemd service
   systemd:
     name: postfix.service
     enabled: true
-    state: "{{ ((postfix_etc_postfix_main_cf_ is changed) or (postfix_etc_postfix_master_cf_ is changed)) | ternary('restarted', 'started') }}"
+    state: "{{ ((_postfix_etc_postfix_main_cf is changed) or (_postfix_etc_postfix_master_cf is changed)) | ternary('restarted', 'started') }}"

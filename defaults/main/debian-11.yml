@@ -2,7 +2,7 @@
 # http://www.postfix.org/master.5.html
 #   Each logical line defines a single Postfix service. Each service is identified by its name and  type.
 # so we use "name type" as key
-postfix_master_conf_default_stretch:
+postfix_master_conf_default_debian_11:
   anvil unix:
     chroot: y
     command: anvil
@@ -82,14 +82,14 @@ postfix_master_conf_default_stretch:
     wakeup: '-'
   maildrop unix:
     chroot: n
-    command: pipe flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
+    command: pipe flags=DRXhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
     maxproc: '-'
     private: '-'
     unpriv: n
     wakeup: '-'
   mailman unix:
     chroot: n
-    command: pipe flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py ${nexthop} ${user}
+    command: pipe flags=FRX user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py ${nexthop} ${user}
     maxproc: '-'
     private: '-'
     unpriv: n
@@ -101,6 +101,13 @@ postfix_master_conf_default_stretch:
     private: n
     unpriv: '-'
     wakeup: '60'
+  postlog unix-dgram:
+    chroot: n
+    command: postlogd
+    maxproc: '1'
+    private: n
+    unpriv: '-'
+    wakeup: '-'
   proxymap unix:
     chroot: n
     command: proxymap
@@ -124,7 +131,7 @@ postfix_master_conf_default_stretch:
     wakeup: '300'
   relay unix:
     chroot: y
-    command: smtp
+    command: smtp -o syslog_name=postfix/$service_name
     maxproc: '-'
     private: '-'
     unpriv: '-'

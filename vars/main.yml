@@ -1,3 +1,6 @@
 ---
-postfix_main_conf_: "{{ postfix_main_conf_default | combine(postfix_main_conf) }}"
-postfix_master_conf_: "{{ lookup('vars', 'postfix_master_conf_default_' ~ ansible_distribution_release) | combine(postfix_master_conf) }}"
+_postfix_main_cf: /etc/postfix/main.cf
+_postfix_master_cf: /etc/postfix/master.cf
+
+_postfix_main_conf: "{{ postfix_main_conf_default | combine(postfix_main_conf) }}"
+_postfix_master_conf: "{{ lookup('vars', 'postfix_master_conf_default_' + ansible_distribution|lower + '_' + ansible_distribution_major_version) | combine(postfix_master_conf) }}"
