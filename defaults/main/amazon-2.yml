@@ -1,73 +1,55 @@
----
-# http://www.postfix.org/master.5.html
-#   Each logical line defines a single Postfix service. Each service is identified by its name and  type.
-# so we use "name type" as key
-postfix_master_conf_default_buster:
+postfix_master_conf_default_amazon_2:
   anvil unix:
-    chroot: y
+    chroot: n
     command: anvil
     maxproc: '1'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   bounce unix:
-    chroot: y
+    chroot: n
     command: bounce
     maxproc: '0'
     private: '-'
     unpriv: '-'
     wakeup: '-'
-  bsmtp unix:
-    chroot: n
-    command: pipe flags=Fq. user=bsmtp argv=/usr/lib/bsmtp/bsmtp -t$nexthop -f$sender $recipient
-    maxproc: '-'
-    private: '-'
-    unpriv: n
-    wakeup: '-'
   cleanup unix:
-    chroot: y
+    chroot: n
     command: cleanup
     maxproc: '0'
     private: n
     unpriv: '-'
     wakeup: '-'
   defer unix:
-    chroot: y
+    chroot: n
     command: bounce
     maxproc: '0'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   discard unix:
-    chroot: y
+    chroot: n
     command: discard
     maxproc: '-'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   error unix:
-    chroot: y
+    chroot: n
     command: error
     maxproc: '-'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   flush unix:
-    chroot: y
+    chroot: n
     command: flush
     maxproc: '0'
     private: n
     unpriv: '-'
     wakeup: 1000?
-  ifmail unix:
-    chroot: n
-    command: pipe flags=F user=ftn argv=/usr/lib/ifmail/ifmail -r $nexthop ($recipient)
-    maxproc: '-'
-    private: '-'
-    unpriv: n
-    wakeup: '-'
   lmtp unix:
-    chroot: y
+    chroot: n
     command: lmtp
     maxproc: '-'
     private: '-'
@@ -80,34 +62,13 @@ postfix_master_conf_default_buster:
     private: '-'
     unpriv: n
     wakeup: '-'
-  maildrop unix:
-    chroot: n
-    command: pipe flags=DRhu user=vmail argv=/usr/bin/maildrop -d ${recipient}
-    maxproc: '-'
-    private: '-'
-    unpriv: n
-    wakeup: '-'
-  mailman unix:
-    chroot: n
-    command: pipe flags=FR user=list argv=/usr/lib/mailman/bin/postfix-to-mailman.py ${nexthop} ${user}
-    maxproc: '-'
-    private: '-'
-    unpriv: n
-    wakeup: '-'
   pickup unix:
-    chroot: y
+    chroot: n
     command: pickup
     maxproc: '1'
     private: n
     unpriv: '-'
     wakeup: '60'
-  postlog unix-dgram:
-    chroot: n
-    command: postlogd
-    maxproc: '1'
-    private: n
-    unpriv: '-'
-    wakeup: '-'
   proxymap unix:
     chroot: n
     command: proxymap
@@ -130,77 +91,63 @@ postfix_master_conf_default_buster:
     unpriv: '-'
     wakeup: '300'
   relay unix:
-    chroot: y
-    command: smtp -o syslog_name=postfix/$service_name
+    chroot: n
+    command: smtp
     maxproc: '-'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   retry unix:
-    chroot: y
+    chroot: n
     command: error
     maxproc: '-'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   rewrite unix:
-    chroot: y
+    chroot: n
     command: trivial-rewrite
     maxproc: '-'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   scache unix:
-    chroot: y
+    chroot: n
     command: scache
     maxproc: '1'
     private: '-'
     unpriv: '-'
     wakeup: '-'
-  scalemail-backend unix:
-    chroot: n
-    command: pipe flags=R user=scalemail argv=/usr/lib/scalemail/bin/scalemail-store ${nexthop} ${user} ${extension}
-    maxproc: '2'
-    private: '-'
-    unpriv: n
-    wakeup: '-'
   showq unix:
-    chroot: y
+    chroot: n
     command: showq
     maxproc: '-'
     private: n
     unpriv: '-'
     wakeup: '-'
   smtp unix:
-    chroot: y
+    chroot: n
     command: smtp
     maxproc: '-'
     private: '-'
     unpriv: '-'
     wakeup: '-'
   tlsmgr unix:
-    chroot: y
+    chroot: n
     command: tlsmgr
     maxproc: '1'
     private: '-'
     unpriv: '-'
     wakeup: 1000?
   trace unix:
-    chroot: y
+    chroot: n
     command: bounce
     maxproc: '0'
     private: '-'
     unpriv: '-'
     wakeup: '-'
-  uucp unix:
-    chroot: n
-    command: pipe flags=Fqhu user=uucp argv=uux -r -n -z -a$sender - $nexthop!rmail ($recipient)
-    maxproc: '-'
-    private: '-'
-    unpriv: n
-    wakeup: '-'
   verify unix:
-    chroot: y
+    chroot: n
     command: verify
     maxproc: '1'
     private: '-'

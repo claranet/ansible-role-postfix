@@ -2,15 +2,13 @@
 # http://www.postfix.org/postconf.5.html
 postfix_main_conf: {}
 postfix_main_conf_default:
-  compatibility_level: 2
-  biff: "no"
   append_dot_mydomain: "no"
-  mailbox_size_limit: 0
-  recipient_delimiter: "+"
-  inet_protocols: ipv4
-  mynetworks: "127.0.0.0/8"
+  biff: "no"
   inet_interfaces: loopback-only
-  alias_maps: "hash:/etc/aliases"
+  inet_protocols: ipv4
+  mailbox_size_limit: 0
+  mynetworks: "127.0.0.0/8"
+  recipient_delimiter: "+"
 
 # http://www.postfix.org/master.5.html
 #   Each logical line defines a single Postfix service. Each service is identified by its name and  type.

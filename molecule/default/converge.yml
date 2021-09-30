@@ -3,9 +3,8 @@
   hosts: all
   become: true
   roles:
-    - role: postfix
-
-  pre_tasks:
-    - name: apt update
-      apt:
-        update_cache: true
+    - role: claranet.postfix
+      postfix_postmap:
+        /etc/postfix/transport: "{{ playbook_dir }}/templates/transport"
+      postfix_postalias:
+        /etc/aliases: "{{ playbook_dir }}/templates/aliases"

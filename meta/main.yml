@@ -1,20 +1,28 @@
 ---
 galaxy_info:
-  role_name: 'postfix'
-  namespace: 'claranet'
-  author: 'SPP SAAS <oxalide.saas_tech@fr.clara.net>'
-  description: 'mail transfer agent (MTA) that routes and delivers electronic mail'
-  company: 'Claranet'
-  license: whatever my boss says
-  min_ansible_version: "4.0.0"
+  role_name: "postfix"
+  namespace: "claranet"
+  description: "Install and configure Postfix"
+  author: "Claranet"
+  company: "Claranet France"
+
+  license: "MPL2"
+
+  min_ansible_version: 2.9
+
+  galaxy_tags: ['claranet', 'postfix', 'system', 'mail']
+
   platforms:
     - name: Debian
       versions:
         - stretch
         - buster
-  galaxy_tags:
-    - system
-# don't include dependencies here as all role should be pined to a version
+        - bullseye
+    - name: Ubuntu
+      versions:
+        - focal
+    - name: Amazon
+      versions:
+        - "2"
+
 dependencies: []
-# on the contrary dependencies should be defined in README
-# and in molecule/default/requirements.yml (without version pinning)

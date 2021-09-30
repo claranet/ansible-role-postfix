@@ -2,6 +2,6 @@
 # 
 # http://www.postfix.org/postconf.5.html
 
-{% for k, v in postfix_main_conf_.items() if v is not none %}
+{% for k, v in _postfix_main_conf.items() if v is not none %}
 {{ k }} = {{ v }}
 {% endfor %}
