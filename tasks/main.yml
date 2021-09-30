@@ -1,5 +1,5 @@
 ---
-- name: postfix - Include "configure_{{ ansible_pkg_mgr }}.yml"
+- name: Include "configure_{{ ansible_pkg_mgr }}.yml"
   include_tasks: "{{ item }}"
   loop: "{{ query('first_found', params) }}"
   vars:
@@ -8,11 +8,11 @@
         - configure_{{ ansible_pkg_mgr }}.yml
       skip: true
 
-- name: postfix - Install postfix
+- name: Install postfix
   package:
     name: postfix
 
-- name: postfix - Configure /etc/postfix/main.cf
+- name: Configure /etc/postfix/main.cf
   template:
     src: etc/postfix/main.cf
     dest: "{{ _postfix_main_cf }}"
@@ -21,7 +21,7 @@
     group: root
   register: _postfix_etc_postfix_main_cf
 
-- name: postfix - Configure /etc/postfix/master.cf
+- name: Configure /etc/postfix/master.cf
   template:
     src: etc/postfix/master.cf
     dest: "{{ _postfix_master_cf }}"
@@ -30,7 +30,7 @@
     group: root
   register: _postfix_etc_postfix_master_cf
 
-- name: postfix - Configure postmap from `postfix_postmap`
+- name: Configure postmap from `postfix_postmap`
   template:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
@@ -42,14 +42,14 @@
     label: "{{ item.key }}"
   register: _postfix_postmap_template
 
-- name: postfix - Execute postmap command  # noqa no-handler
+- name: Execute postmap command  # noqa no-handler
   command: /usr/sbin/postmap "{{ item.item.key }}"
   when: item is changed
   loop: "{{ _postfix_postmap_template.results }}"
   loop_control:
     label: "{{ item.item.key }}"
 
-- name: postfix - Configure postaliases from `postfix_postalias`
+- name: Configure postaliases from `postfix_postalias`
   template:
     src: "{{ item.value }}"
     dest: "{{ item.key }}"
@@ -61,14 +61,14 @@
     label: "{{ item.key }}"
   register: _postfix_postalias_template
 
-- name: postfix - Execute postalias command  # noqa no-handler
+- name: Execute postalias command  # noqa no-handler
   command: /usr/sbin/postalias "{{ item.item.key }}"
   when: item is changed
   loop: "{{ _postfix_postalias_template.results }}"
   loop_control:
     label: "{{ item.item.key }}"
 
-- name: postfix - Enable systemd service
+- name: Enable systemd service
   systemd:
     name: postfix.service
     enabled: true

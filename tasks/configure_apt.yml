@@ -1,15 +1,15 @@
 ---
-- name: "postfix - Update APT cache"
+- name: configure_apt - Update APT cache
   apt:
     update_cache: true
   tags:
     - molecule-idempotence-notest
 
-- name: postfix - Install debconf
+- name: configure_apt - Install debconf
   apt:
     name: debconf
 
-- name: postfix - debconf "No configuration"
+- name: configure_apt - debconf "No configuration"
   debconf:
     name: postfix
     question: postfix/main_mailer_type
